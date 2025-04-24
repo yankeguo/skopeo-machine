@@ -256,7 +256,6 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 		})
 	}
 	args := []string{
-		"skopeo",
 		"copy",
 		"--multi-arch=all",
 	}
