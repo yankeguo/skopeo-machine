@@ -119,7 +119,7 @@ func createConf() (conf Conf, err error) {
 
 	var optConf string
 
-	flag.StringVar(&optConf, "conf", "", "config file")
+	flag.StringVar(&optConf, "conf", "config.json", "config file")
 	flag.Parse()
 
 	buf := rg.Must(os.ReadFile(optConf))
