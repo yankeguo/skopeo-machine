@@ -27,6 +27,11 @@ import (
 )
 
 type Conf struct {
+	Auth struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	} `json:"auth"`
+
 	Job struct {
 		Namespace        string                        `json:"namespace"`
 		Image            string                        `json:"image" default:"quay.io/skopeo/stable:latest"`
@@ -291,13 +296,22 @@ func main() {
 		var err error
 		defer func() {
 			if err == nil {
-				w.Write([]byte("ok"))
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
+				return
 			}
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 		}()
 		defer rg.Guard(&err)
+
+		if username, password, _ := r.BasicAuth(); username != gConf.Auth.Username || password != gConf.Auth.Password {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
 
 		var data struct {
 			Action string `json:"action"`
@@ -310,20 +324,23 @@ func main() {
 		case "copy":
 			{
 				if data.Source == "" {
-					err = fmt.Errorf("source is empty")
+					http.Error(w, "source is empty", http.StatusBadRequest)
 					return
 				}
 				if data.Target == "" {
-					err = fmt.Errorf("target is empty")
+					http.Error(w, "target is empty", http.StatusBadRequest)
 					return
 				}
 				rg.Must0(doCopy(r.Context(), copyOptions{
 					Source: data.Source,
 					Target: data.Target,
 				}))
+				http.Error(w, http.StatusText(http.StatusOK), http.StatusOK)
+				return
 			}
 		default:
-			err = fmt.Errorf("unknown action: %s", data.Action)
+			http.Error(w, "action not supported", http.StatusBadRequest)
+			return
 		}
 	}))
 
