@@ -138,11 +138,11 @@ spec:
           ports:
             - containerPort: 8080
           volumeMounts:
-            - name: config-volume
-              mountPath: /data
-              readOnly: true
+            - name: vol-config
+              mountPath: /data/config.json
+              subPath: config.json
       volumes:
-        - name: config-volume
+        - name: vol-config
           configMap:
             name: skopeo-machine
 ```
