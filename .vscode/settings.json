@@ -1,9 +1,14 @@
 {
     "cSpell.words": [
+        "apimachinery",
+        "batchv",
         "clientcmd",
         "Clientset",
         "corev",
+        "creasty",
+        "dockerconfigjson",
         "KUBECONFIG",
+        "metav",
         "Skopeo"
     ]
 }
