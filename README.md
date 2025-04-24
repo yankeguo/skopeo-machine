@@ -84,20 +84,24 @@ metadata:
 data:
   config.json: |
     {
-      "job": {
-        "namespace": "skopeo",
-        "image": "quay.io/skopeo/stable:latest",
-        "imagePullPolicy": "IfNotPresent",
-        "imagePullSecrets": [
-          {
-            "name": "myregistrykey"
-          }
-        ]
-      },
-      "copy": {
-        "authfileSrc": "myregistrykeysecret-1",
-        "authfileDst": "myregistrykeysecret-2"
-      }
+        "auth": {
+            "username": "hello",
+            "password": "world"
+        },
+        "job": {
+            "namespace": "skopeo",
+            "image": "quay.io/skopeo/stable:latest",
+            "imagePullPolicy": "IfNotPresent",
+            "imagePullSecrets": [
+                {
+                    "name": "myregistrykey"
+                }
+            ]
+        },
+        "copy": {
+            "authfileSrc": "myregistrykeysecret-1",
+            "authfileDst": "myregistrykeysecret-2"
+        }
     }
 ---
 apiVersion: v1
