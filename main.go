@@ -40,6 +40,7 @@ type Conf struct {
 	} `json:"job"`
 
 	Copy struct {
+		MultiArch   string `json:"multiArch" default:"system"`
 		AuthfileSrc string `json:"authfileSrc"`
 		AuthfileDst string `json:"authfileDst"`
 	} `json:"copy"`
@@ -191,12 +192,16 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 		} else {
 			if job.Status.CompletionTime != nil {
 				if time.Now().Sub(job.Status.CompletionTime.Time) > time.Hour*24 {
-					rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{}))
+					rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{
+						PropagationPolicy: ptr(metav1.DeletePropagationBackground),
+					}))
 				} else {
 					existedValid = true
 				}
 			} else {
-				rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{}))
+				rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{
+					PropagationPolicy: ptr(metav1.DeletePropagationBackground),
+				}))
 			}
 		}
 	}
@@ -257,7 +262,9 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 	}
 	args := []string{
 		"copy",
-		"--multi-arch=all",
+	}
+	if gConf.Copy.MultiArch != "" {
+		args = append(args, "--multi-arch="+gConf.Copy.MultiArch)
 	}
 	if gConf.Copy.AuthfileSrc != "" {
 		args = append(args, "--src-authfile=/authfile-src/.dockerconfigjson")

@@ -99,6 +99,7 @@ data:
             ]
         },
         "copy": {
+            "multiArch": "system",
             "authfileSrc": "myregistrykeysecret-1",
             "authfileDst": "myregistrykeysecret-2"
         }
