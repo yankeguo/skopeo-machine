@@ -176,8 +176,13 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 	targetDigest := sha1sum([]byte(opts.Target))
 
 	jobLabels := map[string]string{
-		"com.yankeguo.skopeo-machine/copy-source": sourceDigest,
-		"com.yankeguo.skopeo-machine/copy-target": targetDigest,
+		"com.yankeguo.skopeo-machine/copy.source-image": sourceDigest,
+		"com.yankeguo.skopeo-machine/copy.target-image": targetDigest,
+	}
+
+	jobAnnotations := map[string]string{
+		"com.yankeguo.skopeo-machine/copy.source-image": opts.Source,
+		"com.yankeguo.skopeo-machine/copy.target-image": opts.Target,
 	}
 
 	existed := rg.Must(gClient.BatchV1().Jobs(gConf.Job.Namespace).List(ctx, metav1.ListOptions{
@@ -215,8 +220,10 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 	job.ObjectMeta.Name = "skopeo-copy-" + createId()
 	job.ObjectMeta.Namespace = gConf.Job.Namespace
 	job.ObjectMeta.Labels = jobLabels
+	job.ObjectMeta.Annotations = jobAnnotations
 	job.Spec.TTLSecondsAfterFinished = ptr[int32](600)
 	job.Spec.Template.ObjectMeta.Labels = jobLabels
+	job.Spec.Template.ObjectMeta.Annotations = jobAnnotations
 	job.Spec.Template.Spec.RestartPolicy = corev1.RestartPolicyOnFailure
 	job.Spec.Template.Spec.ImagePullSecrets = gConf.Job.ImagePullSecrets
 	if gConf.Copy.AuthfileSrc != "" {
