@@ -13,7 +13,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/creasty/defaults"
 	"github.com/google/uuid"
@@ -40,6 +39,7 @@ type Conf struct {
 	} `json:"job"`
 
 	Copy struct {
+		TTLSeconds  int32  `json:"ttlSeconds" default:"86400"`
 		MultiArch   string `json:"multiArch" default:"system"`
 		AuthfileSrc string `json:"authfileSrc"`
 		AuthfileDst string `json:"authfileDst"`
@@ -196,13 +196,7 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 			existedValid = true
 		} else {
 			if job.Status.CompletionTime != nil {
-				if time.Now().Sub(job.Status.CompletionTime.Time) > time.Hour*24 {
-					rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{
-						PropagationPolicy: ptr(metav1.DeletePropagationBackground),
-					}))
-				} else {
-					existedValid = true
-				}
+				existedValid = true
 			} else {
 				rg.Must0(gClient.BatchV1().Jobs(gConf.Job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{
 					PropagationPolicy: ptr(metav1.DeletePropagationBackground),
@@ -212,7 +206,7 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 	}
 
 	if existedValid {
-		log.Println("job already exists, skip")
+		log.Println("job active or still valid, skipping")
 		return
 	}
 
@@ -221,7 +215,7 @@ func doCopy(ctx context.Context, opts copyOptions) (err error) {
 	job.ObjectMeta.Namespace = gConf.Job.Namespace
 	job.ObjectMeta.Labels = jobLabels
 	job.ObjectMeta.Annotations = jobAnnotations
-	job.Spec.TTLSecondsAfterFinished = ptr[int32](600)
+	job.Spec.TTLSecondsAfterFinished = ptr(gConf.Copy.TTLSeconds)
 	job.Spec.Template.ObjectMeta.Labels = jobLabels
 	job.Spec.Template.ObjectMeta.Annotations = jobAnnotations
 	job.Spec.Template.Spec.RestartPolicy = corev1.RestartPolicyOnFailure
