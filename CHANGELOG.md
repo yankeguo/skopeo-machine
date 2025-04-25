@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.0.2 - 2025-04-25
+#### Features
+- add ttlSeconds for copy job - (77da94c) - GUO YANKE
+
+- - -
+
 ## v0.0.1 - 2025-04-25
 #### Bug Fixes
 - correct image args - (0780daf) - GUO YANKE
