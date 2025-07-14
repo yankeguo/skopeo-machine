@@ -1,0 +1,68 @@
+openapi: 3.1.0
+info:
+  title: Skopeo Machine API
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+paths:
+  /skopeo_machine/v1/copy:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CopyJob"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopyJobResponse"
+          description: Job submitted successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Invalid request body
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error
+      summary: Submit a copy job
+components:
+  schemas:
+    Error:
+      example:
+        message: message
+      properties:
+        message:
+          description: The error message
+          type: string
+      required:
+      - message
+    CopyJob:
+      example:
+        source: source
+        target: target
+      properties:
+        source:
+          description: The source image to copy from
+          type: string
+        target:
+          description: The target image to copy to
+          type: string
+      required:
+      - source
+      - target
+    CopyJobResponse:
+      example:
+        jobId: jobId
+      properties:
+        jobId:
+          description: The ID of the job
+          type: string
+      required:
+      - jobId

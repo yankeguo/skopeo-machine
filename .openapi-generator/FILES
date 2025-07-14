@@ -1,0 +1,7 @@
+api/openapi.yaml
+api/skopeo_machine/v1/README.md
+api/skopeo_machine/v1/api_default.go
+api/skopeo_machine/v1/model_copy_job.go
+api/skopeo_machine/v1/model_copy_job_response.go
+api/skopeo_machine/v1/model_error.go
+api/skopeo_machine/v1/routers.go
