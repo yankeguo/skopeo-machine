@@ -9,10 +9,9 @@ An API server that launches skopeo jobs in Kubernetes
 ```
 
 ```plain
-POST /any/path
+POST /skopeo_machine/v1/copy
 
 {
-    "action":"copy",
     "source":"some/image:111",
     "target":"registry.mycompany.com/some-image:111"
 }
