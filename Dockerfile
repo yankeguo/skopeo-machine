@@ -6,7 +6,7 @@ WORKDIR /go/src/app
 
 ADD . .
 
-RUN go build -o /skopeo-machine
+RUN go build -o /skopeo-machine ./cmd/skopeo-machine
 
 FROM alpine:3.21
 
